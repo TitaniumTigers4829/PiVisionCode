@@ -15,14 +15,25 @@ camera = inst.startAutomaticCapture()
 camera.setResolution(320, 240)
 sink = inst.getVideo()
 img = np.zeros(shape=(240, 320, 3), dtype=np.uint8)
-colorLow = (95, 86, 6)  # blue i think :)
-colorHigh = (126, 255, 255)
-blue = (255, 0, 0)
+blueLow = (95, 86, 6)  # blue
+blueHigh = (126, 255, 255)
+redLow = (160, 50, 50)
+redHigh = (180, 255, 255)
+blue = (255, 0, 0)  # B,G,R
+red = (0, 0, 255)  # B,G,R
 
 robotCommunication = ntinst.getTable("SmartDashboard")
 
 
 def find_balls(img, cLow, cHigh):
+    """
+    Finds cargo in the image
+
+    :param img: CV2 image to find cargo in
+    :param cLow:
+    :param cHigh:
+    :return: a list [(centerX, centerY, diameter),...]
+    """
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     mask = cv2.inRange(hsv, cLow, cHigh)
@@ -51,11 +62,17 @@ while True:
         print("error")
         dashboard.notifyError(sink.getError())
     else:
-        ball_list = find_balls(img, colorLow, colorHigh)
+        blueBalls = find_balls(img, blueLow, blueHigh)
+        redBalls = find_balls(img, redLow, redHigh)
         if DEBUG:
-            print(ball_list)
-        for ball in ball_list:
+            print("Blue: " + str(blueBalls))
+            print("Red: " + str(redBalls))
+        for ball in blueBalls:
             center = [ball[0], ball[1]]
             img = cv2.circle(img, center, ball[2] / 2, blue, 2)  # img, center, radius, color, thickness
+        for ball in redBalls:
+            center = [ball[0], ball[1]]
+            img = cv2.circle(img, center, ball[2] / 2, red, 2)  # img, center, radius, color, thickness
         dashboard.putFrame(img)
-        # robotCommunication.putNumberArray("Blue Cargo", ball_list)
+        robotCommunication.putNumberArray("Blue Cargo", blueBalls)
+        robotCommunication.putNumberArray("Red Cargo", redBalls)
