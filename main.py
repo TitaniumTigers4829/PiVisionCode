@@ -104,7 +104,7 @@ while True:
         robotCommunication.putNumber("Cargo offset red", bigred[0])
         robotCommunication.putNumber("Cargo height red", bigred[1])
 
-        # dunno why thids fixes it lol
+        # dunno why this fixes it lol
         # without this it freezes
         print("blue offset: " + str(robotCommunication.getNumber("Cargo offset", -1)))
         print("blue height: " + str(robotCommunication.getNumber("Cargo height", -1)))
